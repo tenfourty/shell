@@ -159,7 +159,8 @@ export class AutoTiler {
     detach_window(ext: Ext, win: Entity) {
         this.attached.take_with(win, (prev_fork: Entity) => {
             const reflow_fork = this.forest.detach(prev_fork, win);
-
+            const meta = ext.windows.get(win)
+            meta?.restore_window_hints()
             if (reflow_fork) {
                 const fork = reflow_fork[1];
                 if (fork.is_toplevel && fork.smart_gaps && fork.right === null) {
