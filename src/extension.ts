@@ -732,6 +732,7 @@ export class Ext extends Ecs.System<ExtEvent> {
         }
 
         this.active_hint?.track(win);
+        win.change_window_hints();
 
         this.grab_op = null;
     }
@@ -743,6 +744,8 @@ export class Ext extends Ecs.System<ExtEvent> {
         if (!win) return;
 
         if (win.is_tilable(this)) {
+            win.restore_window_hints();
+
             let entity = win.entity;
             let rect = win.rect();
 
@@ -1212,8 +1215,24 @@ export class Ext extends Ecs.System<ExtEvent> {
         }
     }
 
+    /**
+     * Convenience method to restore hints for all tracked windows by the extension.
+     */
+    restore_all_window_hints() {
+        // restore the hints when disabling
+        for (const window of this.windows.values()) {
+            if (window.is_tilable(this)) {
+                window.restore_window_hints();
+            }
+        }
+
+        // TODO add other storage where windows are being tracked, and loop them here.
+    }
+
     toggle_tiling() {
         if (utils.is_wayland()) return;
+
+        this.restore_all_window_hints();
 
         if (this.auto_tiler) {
             Log.info(`tile by default disabled!`);
@@ -1243,6 +1262,7 @@ export class Ext extends Ecs.System<ExtEvent> {
 
             for (const window of this.windows.values()) {
                 if (window.is_tilable(this)) {
+                    window.change_window_hints();
                     let actor = window.meta.get_compositor_private();
                     if (actor) {
                         if (!window.meta.minimized) {
@@ -1430,6 +1450,7 @@ function enable() {
     }
 
     ext.signals_attach();
+    ext.restore_all_window_hints();
 
     layoutManager.addChrome(ext.overlay);
 
@@ -1447,6 +1468,9 @@ function disable() {
     Log.info("disable");
 
     if (ext) {
+
+        ext.restore_all_window_hints();
+
         ext.signals_remove();
         ext.exit_modes();
 
