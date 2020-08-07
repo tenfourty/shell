@@ -53,6 +53,7 @@ const SHOW_TITLE = 'show-title';
 const SMART_GAPS = 'smart-gaps';
 const SNAP_TO_GRID = 'snap-to-grid';
 const TILE_BY_DEFAULT = 'tile-by-default';
+const OVERRIDE_WM_HINTS = 'override-wm-hints';
 
 export class ExtensionSettings {
     ext: Settings = settings_new_schema(extension.metadata['settings-schema']);
@@ -121,6 +122,10 @@ export class ExtensionSettings {
             : false;
     }
 
+    override_wm_hints(): boolean {
+        return this.ext.get_boolean(OVERRIDE_WM_HINTS);
+    }
+
     // Setters
 
     set_active_hint(set: boolean) {
@@ -157,5 +162,9 @@ export class ExtensionSettings {
 
     set_tile_by_default(set: boolean) {
         this.ext.set_boolean(TILE_BY_DEFAULT, set);
+    }
+
+    set_override_wm_hints(set: boolean) {
+        this.ext.set_boolean(OVERRIDE_WM_HINTS, set);
     }
 }
